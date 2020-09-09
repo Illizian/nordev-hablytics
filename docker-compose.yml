@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  www:
+    image: bitnami/laravel
+    user: "1000:1000"
+    environment:
+      - DB_HOST=mysql
+      - DB_DATABASE=hablytics
+      - DB_USERNAME=hablytics
+      - DB_PASSWORD=hablytics
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    links:
+      - mysql
+    # image: lorisleiva/laravel-docker:7.3
+    # user: "1000:1000"
+    # volumes:
+    #   - .:/var/www
+    # ports:
+    #   - 8000:8000
+    # links:
+    #   - mysql
+    # command: php artisan serve
+  mysql:
+    image: bitnami/mariadb:10.4
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=hablytics
+      - MARIADB_PASSWORD=hablytics
+      - MARIADB_DATABASE=hablytics
