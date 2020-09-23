@@ -20,3 +20,10 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::resources([
+    'diary' => 'DiaryController',
+]);
+
+Route::get('/diary/{diary}/tag', 'DiaryTagController@create');
+Route::post('/diary/{diary}/tag', 'DiaryTagController@store');

@@ -4,9 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Diary;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DiaryController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +25,14 @@ class DiaryController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $diaries = $user->diaries;
+
+        \Debugbar::info("Found {$diaries->count()}");
+
+        return view('diary.index', [
+            'diaries' => $diaries,
+        ]);
     }
 
     /**
@@ -24,7 +42,7 @@ class DiaryController extends Controller
      */
     public function create()
     {
-        //
+        return view("diary.create");
     }
 
     /**
@@ -35,7 +53,14 @@ class DiaryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $diary = Diary::create($request->only([ "name" ]));
+        $diary->save();
+        $id = $diary->id;
+
+        $user = Auth::user();
+        $user->diaries()->attach($id);
+
+        return redirect("/diary/$id");
     }
 
     /**
@@ -46,7 +71,13 @@ class DiaryController extends Controller
      */
     public function show(Diary $diary)
     {
-        //
+        if (! $diary->users->contains(Auth::user())) {
+            return abort(404);
+        }
+
+        return view("diary.show", [
+            "diary" => $diary
+        ]);
     }
 
     /**
@@ -57,7 +88,13 @@ class DiaryController extends Controller
      */
     public function edit(Diary $diary)
     {
-        //
+        if (! $diary->users->contains(Auth::user())) {
+            return abort(404);
+        }
+
+        return view("diary.edit", [
+            "diary" => $diary,
+        ]);
     }
 
     /**
@@ -69,7 +106,15 @@ class DiaryController extends Controller
      */
     public function update(Request $request, Diary $diary)
     {
-        //
+        if (! $diary->users->contains(Auth::user())) {
+            return abort(404);
+        }
+
+        $diary->fill($request->only([ "name" ]));
+        $diary->save();
+        $id = $diary->id;
+
+        return redirect("/diary/$id");
     }
 
     /**
@@ -80,6 +125,12 @@ class DiaryController extends Controller
      */
     public function destroy(Diary $diary)
     {
-        //
+        if (! $diary->users->contains(Auth::user())) {
+            return abort(404);
+        }
+
+        $diary->delete();
+
+        return redirect("/diary");
     }
 }
