@@ -16,6 +16,7 @@ class DiaryController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->authorizeResource(Diary::class, 'diary');
     }
 
     /**
@@ -25,13 +26,8 @@ class DiaryController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        $diaries = $user->diaries;
-
-        \Debugbar::info("Found {$diaries->count()}");
-
         return view('diary.index', [
-            'diaries' => $diaries,
+            'diaries' => Auth::user()->diaries,
         ]);
     }
 
@@ -54,13 +50,9 @@ class DiaryController extends Controller
     public function store(Request $request)
     {
         $diary = Diary::create($request->only([ "name" ]));
-        $diary->save();
-        $id = $diary->id;
+        $user->diaries()->attach(Auth::user());
 
-        $user = Auth::user();
-        $user->diaries()->attach($id);
-
-        return redirect("/diary/$id");
+        return redirect("/diary/$diary->id");
     }
 
     /**
@@ -71,10 +63,6 @@ class DiaryController extends Controller
      */
     public function show(Diary $diary)
     {
-        if (! $diary->users->contains(Auth::user())) {
-            return abort(404);
-        }
-
         return view("diary.show", [
             "diary" => $diary
         ]);
@@ -88,10 +76,6 @@ class DiaryController extends Controller
      */
     public function edit(Diary $diary)
     {
-        if (! $diary->users->contains(Auth::user())) {
-            return abort(404);
-        }
-
         return view("diary.edit", [
             "diary" => $diary,
         ]);
@@ -106,15 +90,10 @@ class DiaryController extends Controller
      */
     public function update(Request $request, Diary $diary)
     {
-        if (! $diary->users->contains(Auth::user())) {
-            return abort(404);
-        }
-
         $diary->fill($request->only([ "name" ]));
         $diary->save();
-        $id = $diary->id;
 
-        return redirect("/diary/$id");
+        return redirect("/diary/$diary->id");
     }
 
     /**
@@ -125,10 +104,6 @@ class DiaryController extends Controller
      */
     public function destroy(Diary $diary)
     {
-        if (! $diary->users->contains(Auth::user())) {
-            return abort(404);
-        }
-
         $diary->delete();
 
         return redirect("/diary");
