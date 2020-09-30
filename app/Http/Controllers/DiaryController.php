@@ -50,9 +50,11 @@ class DiaryController extends Controller
     public function store(Request $request)
     {
         $diary = Diary::create($request->only([ "name" ]));
-        $user->diaries()->attach(Auth::user());
+        Auth::user()->diaries()->attach($diary);
 
-        return redirect("/diary/$diary->id");
+        return redirect()->route('diary.show', [
+            'diary' => $diary->id
+        ]);
     }
 
     /**
@@ -93,7 +95,9 @@ class DiaryController extends Controller
         $diary->fill($request->only([ "name" ]));
         $diary->save();
 
-        return redirect("/diary/$diary->id");
+        return redirect()->route('diary.show', [
+            'diary' => $diary->id
+        ]);
     }
 
     /**
@@ -106,6 +110,6 @@ class DiaryController extends Controller
     {
         $diary->delete();
 
-        return redirect("/diary");
+        return redirect()->route('diary.index');
     }
 }
