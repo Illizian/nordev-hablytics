@@ -6,5 +6,8 @@
         @method('PUT')
 
         <input type="text" name="name" value="{{ $diary->name }}" />
+        @error('name')
+            <p>{{ $message }}</p>
+        @enderror
     </form>
 @endsection

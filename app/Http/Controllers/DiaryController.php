@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Diary;
+use App\Http\Requests\CreateDiaryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,10 +45,10 @@ class DiaryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\CreateDiaryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateDiaryRequest $request)
     {
         $diary = Diary::create($request->only([ "name" ]));
         Auth::user()->diaries()->attach($diary);
@@ -86,11 +87,11 @@ class DiaryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\CreateDiaryRequest  $request
      * @param  \App\Diary  $diary
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Diary $diary)
+    public function update(CreateDiaryRequest $request, Diary $diary)
     {
         $diary->fill($request->only([ "name" ]));
         $diary->save();

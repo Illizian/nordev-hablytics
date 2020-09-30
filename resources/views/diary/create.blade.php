@@ -5,5 +5,8 @@
         @csrf
 
         <input type="text" name="name" />
+        @error('name')
+            <p>{{ $message }}</p>
+        @enderror
     </form>
 @endsection
